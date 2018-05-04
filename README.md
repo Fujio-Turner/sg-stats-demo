@@ -4,7 +4,7 @@ This script pulls stats from SG Admin port localhost:4985/_expvar,in real time, 
 
 #http://localhost:8000
 
-<img src="img/sg-stats-demo1.png" width="75%">
+<img src="img/sg-stats-demo-1.png" width="75%">
 
 **HOW TO USE**
 
