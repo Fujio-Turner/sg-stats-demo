@@ -4,7 +4,16 @@ This script pulls stats from SG Admin port localhost:4985/_expvar,in real time, 
 
 #http://localhost:8000
 
+<img src="img/sg-stats-demo1.png" width="75%">
 
+**HOW TO USE**
+
+-Just run the pythen script and tell it where the sync_gateway_error.log is
+```
+#/path/to/ ./sg-stats-demo.py
+```
+
+**Stats/Data**
 Currently the browser only shows data for:
 
 Revision Cache Misses vs Revision Cache Hits - Total number of times a revision-cache lookup failed vs Total number of times a revision-cache lookup succeeded (as a percentage).
