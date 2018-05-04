@@ -1,10 +1,11 @@
 # sg-stats-demo
 
-This script pulls stats from SG Admin port localhost:4985/_expvar,in real time, and puts them into a basic graph in the browser.
+This script pulls stats from the Sync Gateway Admin port localhost:4985/_expvar,in real time, and puts them into a basic graph in the browser.
 
-#http://localhost:8000
+http://localhost:8000
 
 <img src="img/sg-stats-demo-1.png" width="75%">
+
 
 **HOW TO USE**
 
@@ -12,6 +13,7 @@ This script pulls stats from SG Admin port localhost:4985/_expvar,in real time, 
 ```
 #/path/to/ ./sg-stats-demo.py
 ```
+
 
 **Stats/Data**
 Currently the browser only shows data for:
