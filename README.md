@@ -8,10 +8,8 @@ http://localhost:8000
 
 
 **HOW TO USE**
-
--Just run the pythen script and tell it where the sync_gateway_error.log is
 ```
-#/path/to/ ./sg-stats-demo.py
+#/path/to/sg-stats-demo/ ./sg-stats-demo.py
 ```
 
 
