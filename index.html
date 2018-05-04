@@ -1,0 +1,215 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+  <meta content="utf-8" http-equiv="encoding">
+  <title>SG-Stats-Demo</title>
+
+  <style type="text/css">
+    body, html, select {
+      font: 10pt sans-serif;
+    }
+  </style>
+       <!--
+	/* 
+         <script src="assets/vis.min.js" type="text/javascript"></script>
+          <link href="assets/vis.min.css" rel="stylesheet" type="text/css"/> 
+        */
+	-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.20.1/vis.min.js" type="text/javascript"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.20.1/vis.min.css" rel="stylesheet" type="text/css"/>  
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+
+<div style="max-height: 200px; padding-bottom: 30px;" id="visualization1"></div>
+
+<div style="max-height: 200px; padding-bottom: 30px;" id="visualization2"></div>
+
+<div style="max-height: 200px; float:left;" id="visualization3"></div>
+<div style="max-height: 200px; float:right;" id="visualization4"></div>
+
+<script type="text/javascript">
+
+  var DELAY = 1000; // delay in ms to add new data points
+  // create a graph2d with an (currently empty) dataset
+  var container1 = document.getElementById('visualization1');
+  var container2 = document.getElementById('visualization2');
+  var container3 = document.getElementById('visualization3');
+  var container4 = document.getElementById('visualization4');
+  
+  var dataset1  = new vis.DataSet();
+  var groups1   = new vis.DataSet();
+  groups1.add({ id: 0, content:"Active Requests"});
+
+  var dataset2  = new vis.DataSet();  
+  var groups2   = new vis.DataSet();
+  groups2.add({ id: 0, content:"Active Changes Feeds"});
+  groups2.add({ id: 1, content:"Rev Cache Miss Ratio (%)"});
+  
+  var dataset3 = new vis.DataSet();
+  var groups3   = new vis.DataSet();
+  groups3.add({ id: 0, content:"Out-Of-Order Sequences Posted"});
+  groups3.add({ id: 1, content:"View Queries"});
+
+  var dataset4  = new vis.DataSet();
+  var groups4   = new vis.DataSet();
+  groups4.add({id:  0, content:"Max Sequences Waiting , Missing Earlier Sequence"});
+
+
+  var options1 = { start: vis.moment().add(-30, 'seconds'),end: vis.moment(),drawPoints: {style: 'circle'},
+   height: '220px',shaded: { orientation: 'bottom'},legend: true};
+  var options2 = { start: vis.moment().add(-30, 'seconds'),end: vis.moment(),drawPoints: {style: 'circle'},shaded: {orientation: 'bottom'},height: '220px',legend: true};
+  var options3 = { start: vis.moment().add(-30, 'seconds'),end: vis.moment(),drawPoints: {style: 'circle'},shaded: {orientation: 'bottom'},width: '700px',height: '330px',legend: true};
+  var options4 = { start: vis.moment().add(-30, 'seconds'),end: vis.moment(),drawPoints: {style: 'circle'},shaded: {orientation: 'bottom'},width: '700px',height: '330px',legend: true};
+
+  var graph2da = new vis.Graph2d(container1, dataset1, groups1 ,options1);
+  var graph2db = new vis.Graph2d(container2, dataset2, groups2 ,options2);
+  var graph2dc = new vis.Graph2d(container3, dataset3, groups3 ,options3);
+  var graph2dd = new vis.Graph2d(container4, dataset4, groups4 ,options4);
+
+  function y() {
+    var response = $.ajax({url: "http://localhost:8000",type:"post",async: false}).responseText;
+    return jQuery.parseJSON(response)
+  }
+
+  function renderStep() {
+    var now = vis.moment();
+    var range1 = graph2da.getWindow();
+    var interval1 = range1.end - range1.start;
+    graph2da.setWindow(now - interval1, now, {animation: false});
+    graph2db.setWindow(now - interval1, now, {animation: false});
+    graph2dc.setWindow(now - interval1, now, {animation: false});
+    graph2dd.setWindow(now - interval1, now, {animation: false});
+    setTimeout(renderStep, DELAY);
+  }
+  renderStep();
+
+  function addDataPoint() {
+    var now = vis.moment();
+    b = y()
+    var labelA = {
+    content: b["syncGateway_stats"]["requests_active"],
+    xOffset: -10,
+    yOffset: -5
+    }
+
+    dataset1.add({
+      x: now,
+      y: b["syncGateway_stats"]["requests_active"],
+      label: labelA ,
+      group: 0
+    });
+
+    var labelB = {
+    content: b["syncGateway_stats"]["changesFeeds_active"],
+    xOffset: -10,
+    yOffset: -5
+    }
+
+    var ratio = Math.round((b["syncGateway_stats"]["revisionCache_misses"] / b["syncGateway_stats"]["revisionCache_hits"]) * 100)
+
+    var labelB2 = {
+    content: ratio,
+    xOffset: -10,
+    yOffset: -5
+    }
+
+    dataset2.add(
+      [
+      {x: now, y: b["syncGateway_stats"]["changesFeeds_active"],label: labelB ,group: 0 },
+      {x: now, y: ratio ,label: labelB2 , group: 1 }
+      ]
+    );
+
+    var labelC1 = {
+    content: b["syncGateway_changeCache"]["maxPending"],
+    xOffset: -10,
+    yOffset: -5
+    }
+    var labelC2 = {
+    content: b["syncGateway_changeCache"]["outOfOrder"],
+    xOffset: -10,
+    yOffset: -5
+    }
+    var labelC3 = {
+    content: b["syncGateway_changeCache"]["view_queries"],
+    xOffset: -10,
+    yOffset: -5
+    }
+
+    dataset3.add(
+    [{
+      x: now,
+      y: b["syncGateway_changeCache"]["maxPending"],
+      label: labelC1 ,
+      group: 0
+    },
+    {
+      x: now,
+      y: b["syncGateway_changeCache"]["view_queries"],
+      label: labelC3 ,
+      group: 1
+    }]
+    );
+
+
+    var labelD = {
+    content: b["syncGateway_changeCache"]["outOfOrder"],
+    xOffset: -10,
+    yOffset: -5
+    }
+    
+    dataset4.add(
+    {
+      x: now,
+      y: b["syncGateway_changeCache"]["outOfOrder"],
+      label: labelD ,
+      group: 0
+    }
+    );
+
+    // remove all data points which are no longer visible
+    var range1 = graph2da.getWindow();
+    var interval1 = range1.end - range1.start;
+    var oldIdsA = dataset1.getIds({
+      filter: function (item) {
+        return item.x < range1.start - interval1;
+      }
+    });
+
+    var range2 = graph2db.getWindow();
+    var interval2 = range2.end - range2.start;
+    var oldIdsB = dataset2.getIds({
+      filter: function (item) {
+        return item.x < range2.start - interval2;
+      }
+    });
+
+    var range3 = graph2dc.getWindow();
+    var interval3 = range3.end - range3.start;
+    var oldIdsC = dataset3.getIds({
+      filter: function (item) {
+        return item.x < range3.start - interval3;
+      }
+    });
+
+    var range4 = graph2dd.getWindow();
+    var interval4 = range4.end - range4.start;
+    var oldIdsD = dataset4.getIds({
+      filter: function (item) {
+        return item.x < range4.start - interval4;
+      }
+    });
+
+    dataset1.remove(oldIdsA);
+    dataset2.remove(oldIdsB);
+    dataset3.remove(oldIdsC);
+    dataset3.remove(oldIdsD);
+    setTimeout(addDataPoint, DELAY);
+  }
+  addDataPoint();
+</script>
+</body>
+</html>
