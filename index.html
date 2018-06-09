@@ -108,7 +108,7 @@
     yOffset: -5
     }
 
-    var ratio = Math.round((b["syncGateway_stats"]["revisionCache_misses"] / b["syncGateway_stats"]["revisionCache_hits"]) * 100)
+    var ratio = Math.round((b["syncGateway_stats"]["revisionCache_misses"] / b["syncGateway_stats"]["revisionCache_hits"]) * 100 , 2)
 
     var labelB2 = {
     content: ratio,
