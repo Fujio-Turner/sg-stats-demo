@@ -72,7 +72,7 @@ class S(BaseHTTPRequestHandler):
         
 
     def pullSGStats(self):
-        url = "http://10.2.21.113:4985/_expvar"
+        url = "http://localhost:4985/_expvar"
         if self.debug == True:
             print("DEBUG: ", url)
 
